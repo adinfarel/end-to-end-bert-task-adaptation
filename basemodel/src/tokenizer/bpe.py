@@ -20,6 +20,8 @@ class AlmondTokenizerBERT:
         "[PAD]",  #TODO: if i'm use WordPiece add [UNK] token
     ]
     
+    MAX_CHARS = 1_000_000
+    
     def __init__(self, config: Box) -> None:
         self.config: Box = config
         self.vocab_size: int = self.config.tokenizer.vocab_size
@@ -121,7 +123,7 @@ class AlmondTokenizerBERT:
         '''Train bpe to get merges.'''
         print("TRAIN BPE TO GET VOCAB AND MERGES...")
         
-        tokens = text.encode('utf-8')
+        tokens = text[:self.MAX_CHARS].encode('utf-8')
         print("Encode text with encoding utf-8\nOverview:", tokens[:100])
         num_merges = self.vocab_size - self.single_byte_size - len(self.SPECIAL_TOKENS)
         id_used = self.single_byte_size + len(self.SPECIAL_TOKENS)
