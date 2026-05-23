@@ -2,7 +2,7 @@ datasets:
   dataset_name: WikipediaPlainText
   dataset_raw_path: basemodel/data/raw/AllCombined.txt
   dataset_tokenize_path: basemodel/data/raw/sent_tokenize_text.txt
-  dataset_processed_path: basemodel/data/processed/corpus.bin
+  dataset_processed_path: basemodel/data/processed/
   max_dataset: 50000
 
 tokenizer:
