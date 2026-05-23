@@ -1,0 +1,5 @@
+datasets:
+  dataset_name: WikipediaPlainText
+  dataset_raw_path: basemodel/data/raw/AllCombined.txt
+  dataset_tokenize_path: basemodel/data/raw/sent_tokenize_text.txt
+  max_dataset: 50000
