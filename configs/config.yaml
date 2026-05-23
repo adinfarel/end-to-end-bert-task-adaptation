@@ -3,3 +3,8 @@ datasets:
   dataset_raw_path: basemodel/data/raw/AllCombined.txt
   dataset_tokenize_path: basemodel/data/raw/sent_tokenize_text.txt
   max_dataset: 50000
+
+tokenizer:
+  vocab_size: 16000
+  merges_path: basemodel/models/tokenizer/merges.json
+  vocab_path: basemodel/models/tokenizer/vocab.json
