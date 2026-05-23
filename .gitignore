@@ -8,3 +8,11 @@ __pycache__/
 venv/
 env/
 ENV/
+
+# Data
+basemodel/data/raw/*
+basemodel/data/processed/*
+!basemodel/data/raw/.gitkeep
+!basemodel/data/raw/README.md
+!basemodel/data/processed/.gitkeep
+!basemodel/data/processed/README.md
