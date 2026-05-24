@@ -9,3 +9,6 @@ processed-datasets:
 
 validate-tokenizer:
 	python -m basemodel.tests.validate_tokenizer
+
+datasets-loader:
+	python -m basemodel.src.data.loader

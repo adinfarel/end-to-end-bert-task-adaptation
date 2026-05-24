@@ -9,3 +9,8 @@ tokenizer:
   merges_path: basemodel/models/tokenizer/merges.json
   vocab_path: basemodel/models/tokenizer/vocab.json
   vocab_size: 10887
+
+models:
+  max_len: 128
+  batch_size: 32
+  mask_prob: 0.15
