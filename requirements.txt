@@ -2,3 +2,4 @@ datasets
 torch
 nltk
 python-box
+jsonlines

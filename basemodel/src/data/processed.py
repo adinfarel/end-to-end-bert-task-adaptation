@@ -5,9 +5,10 @@ Convert corpus text into corpus integer
 '''
 
 from configs.config import CONFIG
-from utils.common import save_bin, load_txt
+from utils.common import load_txt
 from basemodel.src.tokenizer.bpe import AlmondTokenizerBERT
 
+import jsonlines
 import argparse
 from box import Box
 from tqdm import tqdm
@@ -26,30 +27,29 @@ def processed_dataset(config: Box, train_split: bool = True, corpus: bool = True
     )
     
     print(f"Starting process convert corpus text to corpus integer")
-    all_token_ids = []
-    extend = all_token_ids.extend
+
     lines = data.splitlines(keepends=True)
-    
     print(f"Tokenizing {len(lines)} lines of text")
     
     if corpus:
-        for i, line in tqdm(enumerate(lines), desc="Tokenizing text"):
-            if not line.strip():
-                continue
-            
-            token_ids = tokenizer.encode(line)
-            if i % 100 == 0:
-                print(
-                    f"Steps: {i}"
-                    f"\nLines text: {line[:10]}"
-                    f"\nToken ids: {token_ids[:10]}"
-                )
-            extend(token_ids)
-        print("Tokenizing corpus text complete")
+        file_path = config.datasets.dataset_processed_path + "corpus.jsonl"
+        with jsonlines.open(file_path, mode="w") as f:
+            for i, line in tqdm(enumerate(lines), total=len(lines), desc="Tokenizing text"):
+                if not line.strip():
+                    continue
+                
+                token_ids = tokenizer.encode(line)
+                f.write({"tokens": token_ids})
+                
+                if i % 100 == 0:
+                    print(
+                        f"Steps: {i}"
+                        f"\nLines text: {line[:10]}"
+                        f"\nToken ids: {token_ids[:10]}"
+                    )
 
-        file_path = config.datasets.dataset_processed_path + "corpus.bin"
-        save_bin(file_path=file_path, data=all_token_ids)
-        print(f"Processed corpus integer save to path: {file_path}")
+        print("Tokenizing corpus text complete")
+        print(f"Save dataset corpus to {file_path}")
     
     if train_split:
         split_idx = int(train_ratio * len(lines))
@@ -59,24 +59,22 @@ def processed_dataset(config: Box, train_split: bool = True, corpus: bool = True
               f"val data: {(1 - train_ratio) * 100:.2f}% of corpus.")
         
         for data, name in splits:
-            all_tokens = []
-            extend = all_tokens.extend
-            
-            for i, line in tqdm(enumerate(data), desc=f"Tokenizing {name} data"):
-                if not line.strip():
-                    continue
-                
-                token_ids = tokenizer.encode(line)
-                if i % 100 == 0:
-                    print(
-                        f"Steps: {i}"
-                        f"\nLines text: {line[:10]}"
-                        f"\nToken ids: {token_ids[:10]}"
-                    )
-                extend(token_ids)
-            
-            file_path = config.datasets.dataset_processed_path + f"{name}_data.bin"
-            save_bin(file_path=file_path, data=all_tokens)
+            file_path = config.datasets.dataset_processed_path + f"{name}_data.jsonl"
+            with jsonlines.open(file_path, mode="w") as f:
+                for i, line in tqdm(enumerate(data), total=len(data), desc=f"Tokenizing {name} data"):
+                    if not line.strip():
+                        continue
+                    
+                    token_ids = tokenizer.encode(line)
+                    f.write({"tokens": token_ids})
+                    
+                    if i % 100 == 0:
+                        print(
+                            f"Steps: {i}"
+                            f"\nLines text: {line[:10]}"
+                            f"\nToken ids: {token_ids[:10]}"
+                        )
+                        
             print(f"Tokenizing {name} data complete. Save to {file_path}")
 
 def str2bool(value: str) -> bool:
