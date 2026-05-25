@@ -14,3 +14,15 @@ models:
   max_len: 128
   batch_size: 32
   mask_prob: 0.15
+  n_heads: 8
+  embed_dim: 256
+  dropout: 0.1
+  n_blocks: 6
+  early_stopping_patience: 5
+  early_stopping: true
+  learning_rate: 0.001
+  model_save_path: basemodel/models/checkpoints
+
+  epochs: 5000
+  eval_interval: 500
+  eval_epochs: 200
