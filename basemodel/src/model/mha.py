@@ -11,12 +11,14 @@ import torch.nn.functional as F
 from basemodel.src.model.pos_enc import RotaryPositionalEncoding
 
 class MultiHeadAttention(nn.Module):
-    def __init__(self, embed_dim: int, n_heads: int, dropout: float = 0.1):
+    def __init__(self, embed_dim: int, n_heads: int, layer_idx: int, dropout: float = 0.1, window_size: int = 3):
         super().__init__()
         assert embed_dim % n_heads == 0, "embed_dim must be divisible by n_heads"
         self.embed_dim = embed_dim
         self.num_heads = n_heads
         self.head_size = self.embed_dim // self.num_heads
+        self.layer_idx = layer_idx
+        self.window_size = window_size
         
         self.query = nn.Linear(embed_dim, embed_dim)
         self.key = nn.Linear(embed_dim, embed_dim)
@@ -26,33 +28,40 @@ class MultiHeadAttention(nn.Module):
         self.proj = nn.Linear(embed_dim, embed_dim)
         self.rope = RotaryPositionalEncoding(self.head_size)
     
-    def forward(self, x: torch.Tensor, attn_mask: torch.Tensor | None = None):
-        B, T, C = x.shape
-        
-        if attn_mask is not None:
-            attn_mask = attn_mask.view(B, 1, 1, T).bool()
+    def forward(self, x: torch.Tensor, unpad_mask: torch.Tensor | None = None):
+        Total_Tokens, C = x.shape
         
         Q = self.query(x)
         K = self.key(x)
         V = self.value(x)
         
-        Q = Q.view(B, T, self.num_heads, self.head_size).transpose(1, 2) # (B, num_heads, T, head_size)
-        K = K.view(B, T, self.num_heads, self.head_size).transpose(1, 2) # (B, num_heads, T, head_size)
-        V = V.view(B, T, self.num_heads, self.head_size).transpose(1, 2) # (B, num_heads, T, head_size)
+        Q = Q.view(1, Total_Tokens, self.num_heads, self.head_size).transpose(1, 2) # (B, num_heads, T, head_size)
+        K = K.view(1, Total_Tokens, self.num_heads, self.head_size).transpose(1, 2) # (B, num_heads, T, head_size)
+        V = V.view(1, Total_Tokens, self.num_heads, self.head_size).transpose(1, 2) # (B, num_heads, T, head_size)
         
         Q_rope = self.rope(Q)
         K_rope = self.rope(K)
+        
+        final_mask = unpad_mask.clone() #type: ignore
+        
+        # Alternating Attention
+        if self.layer_idx % 2 != 0:
+            coords = torch.arange(Total_Tokens, device=x.device)
+            dist_matrix = torch.abs(coords.unsqueeze(0) - coords.unsqueeze(1)) #MANHATTAN
+            
+            sliding_mask = (dist_matrix > self.window_size).unsqueeze(0).unsqueeze(0) # (1, 1, Total_Tokens, TOtal_Tokens)
+            final_mask = final_mask.masked_fill(sliding_mask, float('-inf'))
         
         out = F.scaled_dot_product_attention(
             query=Q_rope,
             key=K_rope,
             value=V,
-            attn_mask=attn_mask,
+            attn_mask=final_mask,
             is_causal=False,
-            dropout_p=self.dropout if self.training else 0.0
+            dropout_p=self.dropout if self.training else 0.0,
         )
         
         out = out.transpose(1, 2).contiguous() # (B, T, num_heads, head_size)
-        out = out.view(B, T, self.num_heads * self.head_size)
+        out = out.view(Total_Tokens, self.embed_dim)
         
         return self.proj(out)

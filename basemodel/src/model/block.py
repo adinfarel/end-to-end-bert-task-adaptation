@@ -13,12 +13,14 @@ from basemodel.src.model import(
 )
 
 class Block(nn.Module):
-    def __init__(self, n_embd: int, n_heads: int, dropout: float):
+    def __init__(self, n_embd: int, n_heads: int, layer_idx: int, dropout: float):
         super().__init__()
         self.attn = mha.MultiHeadAttention(
             embed_dim=n_embd,
             n_heads=n_heads,
-            dropout=dropout
+            dropout=dropout,
+            layer_idx=layer_idx,
+            window_size=3
         )
         self.pre_ln1 = nn.LayerNorm(n_embd)
         self.ffwd = ffwd.GeGLU(embed_dim=n_embd, dropout=dropout)
