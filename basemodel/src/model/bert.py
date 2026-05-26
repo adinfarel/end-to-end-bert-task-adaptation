@@ -4,10 +4,6 @@ src/model/bert.py
 This is cinema cools hehe, in this section i will creat BERT with piece that i'm build previous
 '''
 
-import enum
-from xml.etree.ElementTree import _Target
-
-from numpy import mask_indices
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -58,7 +54,7 @@ class AlmondBERTModel(nn.Module):
         unpad_attn_mask = unpad_attn_mask.unsqueeze(0).unsqueeze(0)
         
         for block in self.blocks:
-            x = block(x_unpadded, attn_mask=unpad_attn_mask)
+            x_unpadded = block(x_unpadded, attn_mask=unpad_attn_mask)
             
         x_repadded_flat = torch.zeros(B * T, self.config.models.embed_dim, device=x.device)
         x_repadded_flat[non_pad_indices] = x_unpadded
@@ -92,6 +88,6 @@ class AlmondBERTModel(nn.Module):
             
             topk_probs, topk_idx = torch.topk(probabilities, top_k)
             
-            results[mask_id] = {"topk_probs": topk_probs, "topk_idx": topk_idx}
+            results[mask_id.item()] = {"topk_probs": topk_probs.tolist(), "topk_idx": topk_idx.tolist()}
         
         return results
