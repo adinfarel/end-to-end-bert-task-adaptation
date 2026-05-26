@@ -6,9 +6,16 @@ Gradient Clipping for prevent Exploding Gradient, Warmup + Learning Rate Schedul
 '''
 
 import sys
+from pathlib import Path
+
+# ADDING PROJECT ROOT
+ROOT = Path(__file__).resolve().parents[3]
+
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+    
 import torch
 from torch.utils.data import DataLoader
-from pathlib import Path
 from box import Box
 from tqdm import tqdm
 
@@ -17,15 +24,10 @@ from basemodel.src.data.loader import create_dataloaders, load_jsonl
 from basemodel.src.tokenizer.bpe import AlmondTokenizerBERT
 from basemodel.src.model.bert import AlmondBERTModel
 
-# ADDING PROJECT ROOT
-ROOT = Path(__file__).resolve().parents[3]
-
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
     
 # ENVIRONTMENT
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-DTYPE = torch.bfloat16 if torch.cuda.is_available() and torch.cuda.is_bf16_supported else torch.float16
+DTYPE = torch.bfloat16 if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else torch.float16
 
 # HELPER
 def load_tokenizer_and_model() -> tuple[AlmondBERTModel, AlmondTokenizerBERT]:
@@ -96,7 +98,7 @@ def main(config: Box) -> None:
         T_max=total_steps,
         eta_min=1e-5,
     )
-    scaler = torch.GradScaler(enabled=(DTYPE == torch.float16))
+    scaler = torch.GradScaler(device="cuda", enabled=(DTYPE == torch.float16))
     early_stopping_counter = 0
     early_stopping_patience = config.models.early_stopping_patience
     
@@ -120,7 +122,7 @@ def main(config: Box) -> None:
     else:
         print("Checkpoint not found. Starting training from scratch.")
     
-    for iter in range(config.models.epochs):
+    for iter in range(start_iter, config.models.epochs):
         progress_bar = tqdm(train_loader, desc=f"Epoch {iter + 1}/{config.models.epochs}")
         if iter % config.models.eval_interval == 0:
             losses = eval_loss(model=model, val_loader=val_loader)

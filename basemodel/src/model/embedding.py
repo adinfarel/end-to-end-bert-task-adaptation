@@ -4,8 +4,6 @@ src/model/embedding.py
 To get representation vector numeric each token in vector space
 '''
 
-from turtle import forward
-
 import torch
 import torch.nn as nn
 

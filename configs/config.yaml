@@ -25,4 +25,3 @@ models:
 
   epochs: 5000
   eval_interval: 500
-  eval_epochs: 200

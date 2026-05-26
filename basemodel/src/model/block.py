@@ -28,6 +28,6 @@ class Block(nn.Module):
     
     def forward(self, x: torch.Tensor, attn_mask: torch.Tensor | None = None):
         # Why x + ... ? it is method to prevent vanishing gradient, name method is ResNet 
-        x = x + self.attn(self.pre_ln1(x), attn_mask=attn_mask)
+        x = x + self.attn(self.pre_ln1(x), unpad_mask=attn_mask)
         x = x + self.ffwd(self.pre_ln2(x))
         return x

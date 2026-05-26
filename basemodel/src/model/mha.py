@@ -42,7 +42,7 @@ class MultiHeadAttention(nn.Module):
         Q_rope = self.rope(Q)
         K_rope = self.rope(K)
         
-        final_mask = unpad_mask.clone() #type: ignore
+        final_mask = None if unpad_mask is None else unpad_mask.clone() #type: ignore
         
         # Alternating Attention
         if self.layer_idx % 2 != 0:
@@ -50,6 +50,14 @@ class MultiHeadAttention(nn.Module):
             dist_matrix = torch.abs(coords.unsqueeze(0) - coords.unsqueeze(1)) #MANHATTAN
             
             sliding_mask = (dist_matrix > self.window_size).unsqueeze(0).unsqueeze(0) # (1, 1, Total_Tokens, TOtal_Tokens)
+            
+            if final_mask is None:
+                final_mask = torch.zeros(
+                    (1, 1, Total_Tokens, Total_Tokens),
+                    device=x.device,
+                    dtype=Q.dtype
+                )
+            
             final_mask = final_mask.masked_fill(sliding_mask, float('-inf'))
         
         out = F.scaled_dot_product_attention(
