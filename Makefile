@@ -12,3 +12,6 @@ validate-tokenizer:
 
 datasets-loader:
 	python -m basemodel.src.data.loader
+
+train-basemodel:
+	python -m basemodel.src.training.train_model
