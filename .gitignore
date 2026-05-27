@@ -18,3 +18,6 @@ basemodel/data/processed/*
 !basemodel/data/processed/README.md
 basemodel/models/checkpoints/*
 !basemodel/models/checkpoints/README.md
+
+downstream/data/raw/*
+!downstream/data/raw/README.md

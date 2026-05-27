@@ -18,3 +18,10 @@ train-basemodel:
 
 inference-basemodel:
 	python -m basemodel.tests.inference_bert
+
+# --------------------------------------------------------
+# DOWNSTREAM
+# --------------------------------------------------------
+
+load-datasets:
+	python -m downstream.src.data.datasets
