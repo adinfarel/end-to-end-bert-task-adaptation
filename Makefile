@@ -25,3 +25,6 @@ inference-basemodel:
 
 load-datasets:
 	python -m downstream.src.data.datasets
+
+test-dataloader:
+	python -m downstream.tests.validate_dataloader
