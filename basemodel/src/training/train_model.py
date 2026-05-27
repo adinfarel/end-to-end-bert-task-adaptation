@@ -122,8 +122,8 @@ def main(config: Box) -> None:
     else:
         print("Checkpoint not found. Starting training from scratch.")
     
-    for iter in range(start_iter, config.models.epochs):
-        progress_bar = tqdm(train_loader, desc=f"Epoch {iter + 1}/{config.models.epochs}")
+    for iter in range(start_iter + 1, config.models.epochs + 1):
+        progress_bar = tqdm(train_loader, desc=f"Epoch {iter}/{config.models.epochs}")
         if iter % config.models.eval_interval == 0:
             losses = eval_loss(model=model, val_loader=val_loader)
             print(f"Step {iter} | Eval loss {losses}")

@@ -15,3 +15,6 @@ datasets-loader:
 
 train-basemodel:
 	python -m basemodel.src.training.train_model
+
+inference-basemodel:
+	python -m basemodel.tests.inference_bert

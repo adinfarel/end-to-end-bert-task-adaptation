@@ -11,17 +11,17 @@ tokenizer:
   vocab_size: 10887
 
 models:
-  max_len: 128
-  batch_size: 32
+  max_len: 256
+  batch_size: 64
   mask_prob: 0.15
   n_heads: 8
   embed_dim: 256
   dropout: 0.1
-  n_blocks: 6
+  n_blocks: 8
   early_stopping_patience: 5
   early_stopping: true
   learning_rate: 0.001
   model_save_path: basemodel/models/checkpoints
 
-  epochs: 5000
-  eval_interval: 500
+  epochs: 15
+  eval_interval: 3
