@@ -91,3 +91,67 @@ class AlmondBERTModel(nn.Module):
             results[mask_id.item()] = {"topk_probs": topk_probs.tolist(), "topk_idx": topk_idx.tolist()}
         
         return results
+
+    def encode(self, x: torch.Tensor, attn_mask: torch.Tensor) -> torch.Tensor:
+        """
+        Encode input token ids into contextual hidden states.
+        
+        Inputs:
+            x: Token IDs, shape (B, T)
+            attn_mask: 1 for valid token, 0 for PAD, shape (B, T)
+        
+        Returns:
+            hidden_states: contextual token representation, shape (B, T)
+        
+        This is the reusable BERT backbone output for downstream task such as:
+        - MLM
+        - NER
+        - POS Tagging
+        - text classification
+        """
+        B, T = x.shape
+        D = self.config.models.embed_dim
+        
+        non_pad_indices = torch.nonzero(
+            attn_mask.reshape(-1),
+            as_tuple=True
+        )[0]
+        
+        x_emb = self.embedding(x)
+        x_flat = x_emb.reshape(B * T, D)
+        x_unpadded = x_emb[non_pad_indices]
+        
+        batch_ids = (
+            torch.arange(B, device=x.device) # (B,)
+            .unsqueeze(1) # (B, 1)
+            .expand(B, T) # (B, T)
+            .reshape(-1) # (B * T)
+        )
+        
+        valid_batch_ids = batch_ids[non_pad_indices]
+        
+        same_batch_ids = (
+            valid_batch_ids.unsqueeze(0) == valid_batch_ids.unsqueeze(1)
+        )
+        
+        unpad_attn_mask = torch.zeros(
+            same_batch_ids.shape,
+            device=x.device,
+            dtype=x.dtype,
+        )
+        
+        unpad_attn_mask = unpad_attn_mask.masked_fill(
+            ~same_batch_ids, float("-inf")
+        )
+        
+        unpad_attn_mask = unpad_attn_mask.unsqueeze(0).unsqueeze(0) # (1, 1, T, T)
+        
+        for block in self.blocks:
+            x_unpadded = block(x_unpadded, attn_mask=unpad_attn_mask)
+        
+        x_repadded_flat = x_emb.new_zeros(B * T, D)
+        x_repadded_flat[non_pad_indices] = x_unpadded
+        
+        hidden_states = x_repadded_flat.reshape(B, T, D)
+        
+        return hidden_states
