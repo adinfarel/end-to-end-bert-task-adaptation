@@ -28,3 +28,6 @@ load-datasets:
 
 test-dataloader:
 	python -m downstream.tests.validate_dataloader
+
+training-ner:
+	python -m downstream.src.training.train_ner

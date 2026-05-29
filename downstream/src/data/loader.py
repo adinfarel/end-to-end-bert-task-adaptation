@@ -206,6 +206,6 @@ def create_ner_dataloaders(
     return DataLoader(
         dataset=dataset,
         collate_fn=custom_collate_fn,
-        batch_size=config.models.batch_size,
+        batch_size=config.downstream.batch_size,
         shuffle=shuffle
     )
