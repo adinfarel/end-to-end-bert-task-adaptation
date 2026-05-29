@@ -137,7 +137,7 @@ class AlmondBERTModel(nn.Module):
         unpad_attn_mask = torch.zeros(
             same_batch_ids.shape,
             device=x.device,
-            dtype=x.dtype,
+            dtype=x_emb.dtype,
         )
         
         unpad_attn_mask = unpad_attn_mask.masked_fill(
