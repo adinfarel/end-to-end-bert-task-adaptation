@@ -119,7 +119,7 @@ class AlmondBERTModel(nn.Module):
         
         x_emb = self.embedding(x)
         x_flat = x_emb.reshape(B * T, D)
-        x_unpadded = x_emb[non_pad_indices]
+        x_unpadded = x_flat[non_pad_indices]
         
         batch_ids = (
             torch.arange(B, device=x.device) # (B,)

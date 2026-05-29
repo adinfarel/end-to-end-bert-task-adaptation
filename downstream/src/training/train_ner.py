@@ -48,7 +48,7 @@ def eval_loss(model: AlmondBERTForNER, val_loader: DataLoader) -> float:
 def main(config: Box, early_stopping: bool = True, freeze_model: bool = False) -> None:
     print("TRAINING PIPELINE NER")
     train_data_path = Path(config.downstream.raw_dataset_path) / "train.jsonl"
-    val_data_path = Path(config.downstream.raw_dataset_path) / "val.jsonl"
+    val_data_path = Path(config.downstream.raw_dataset_path) / "validation.jsonl"
     
     print("LOAD TOKENIZER")
     tokenizer = AlmondTokenizerBERT(config)
