@@ -21,3 +21,6 @@ basemodel/models/checkpoints/*
 
 downstream/data/raw/*
 !downstream/data/raw/README.md
+
+!downstream/models/checkpoints/README.md
+downstream/models/checkpoints/*

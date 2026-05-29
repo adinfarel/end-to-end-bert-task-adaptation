@@ -31,3 +31,6 @@ test-dataloader:
 
 training-ner:
 	python -m downstream.src.training.train_ner
+
+testing-ner:
+	python -m downstream.tests.test_ner_model
