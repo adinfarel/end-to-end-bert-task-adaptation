@@ -30,7 +30,7 @@ Each task uses the same pre-trained encoder — only the head changes.
 
 NER is a **token-level classification** task. Every token in a sentence receives a label indicating what kind of entity it is (or isn't).
 
-**Entity types in CoNLL-2003:**
+**Entity types in Wikiann-NER:**
 
 ```
 O     → not an entity ("the", "is", "at")
