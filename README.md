@@ -201,5 +201,5 @@ BPE splits by frequency, not linguistic boundaries. Masking a subword fragment i
 
 ---
 
-*Built by Adinfarel — Semester 4, AI Engineering track*
+*Built by Adinfarel — AI Engineering track*
 *"The goal was never to build something impressive. The goal was to understand."*
