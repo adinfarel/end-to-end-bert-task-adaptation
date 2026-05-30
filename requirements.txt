@@ -4,3 +4,4 @@ nltk
 python-box
 jsonlines
 seqeval
+matplotlib
