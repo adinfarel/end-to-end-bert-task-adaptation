@@ -34,3 +34,6 @@ training-ner:
 
 testing-ner:
 	python -m downstream.tests.test_ner_model
+
+evaluate-ner:
+	python -m downstream.evaluation.evaluate_ner

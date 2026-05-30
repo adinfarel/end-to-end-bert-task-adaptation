@@ -3,3 +3,4 @@ torch
 nltk
 python-box
 jsonlines
+seqeval
